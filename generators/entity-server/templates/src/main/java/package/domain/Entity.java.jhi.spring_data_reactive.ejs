@@ -21,6 +21,9 @@
  EJS fragments will process % delimiter tags in template and & delimiter tags in the merge process.
 -%>
 <&_ if (fragment.importSection) { -&>
+  <%_ if (requiresPersistableImplementation) { _%>
+    import org.springframework.data.domain.Persistable;
+  <%_ } _%>
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
@@ -30,6 +33,12 @@ import org.springframework.data.relational.core.mapping.Table;
 <&_ if (fragment.annotationSection) { -&>
 @Table("<%= entityTableName %>")
 <&_ } -&>
+
+<%_ if (requiresPersistableImplementation) { _%>
+<&_ if (fragment.additonalInterfacesSection) { -&>
+, Persistable<<%= primaryKey.type %>>
+<&_ } -&>
+<%_ } _%>
 
 <%_ for (const field of fields) { _%>
 <&_ if (fragment.field<%- field.fieldNameCapitalized %>AnnotationSection) { -&>
@@ -112,3 +121,28 @@ import org.springframework.data.relational.core.mapping.Table;
       <%_ } _%>
     <%_ } _%>
 <&_ } -&>
+
+<%_ if (requiresPersistableImplementation) { _%>
+  <&_ if (fragment.classAdditionalFieldsSection) { -&>
+    @Transient
+    private boolean isNew;
+  <&_ } -&>
+  <&_ if (fragment.classAdditionalFieldsMethodsSection) { -&>
+
+    @Override
+    public <%= primaryKey.type %> getId() {
+        return this.<%= primaryKey.name %>;
+    }
+
+    @Transient
+    @Override
+    public boolean isNew() {
+        return !this.isNew;
+    }
+
+    public <%= persistClass %> setIsNew() {
+        this.isNew = true;
+        return this;
+    }
+  <&_ } -&>
+<%_ } _%>

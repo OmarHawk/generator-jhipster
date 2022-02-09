@@ -75,6 +75,16 @@ const serverFiles = {
         {
           file: 'package/domain/Entity.java.jhi.spring_data_reactive',
           renameTo: generator => `${generator.entityAbsoluteFolder}/domain/${generator.persistClass}.java.jhi.spring_data_reactive`,
+        }
+      ],
+    },
+    {
+      condition: generator => generator.databaseTypeSql && generator.reactive && generator.requiresPersistableImplementation,
+      path: SERVER_MAIN_SRC_DIR,
+      templates: [
+        {
+          file: 'package/domain/EntityCallback.java.jhi.spring_data_reactive',
+          renameTo: generator => `${generator.entityAbsoluteFolder}/domain/${generator.persistClass}Callback.java`,
         },
       ],
     },

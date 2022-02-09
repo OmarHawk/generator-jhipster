@@ -253,6 +253,11 @@ public class <%= entityClass %>Resource {
       <%_ } _%>
     <% } %>
   <%_ } _%>
+  <%_ if (requiresPersistableImplementation) { _%>
+
+      <%= entityInstance %>.setIsNew();
+
+  <%_ } _%>
 <%- include('/partials/save_template', {asEntity, asDto, viaService: viaService, returnDirectly: false, isUsingMapsId: false, mapsIdAssoc: mapsIdAssoc}); -%>
   <%_ if (reactive) { _%>
             .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
