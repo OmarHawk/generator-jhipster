@@ -75,7 +75,7 @@ const serverFiles = {
         {
           file: 'package/domain/Entity.java.jhi.spring_data_reactive',
           renameTo: generator => `${generator.entityAbsoluteFolder}/domain/${generator.persistClass}.java.jhi.spring_data_reactive`,
-        }
+        },
       ],
     },
     {
