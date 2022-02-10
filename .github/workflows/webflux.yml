@@ -149,6 +149,15 @@ jobs:
             war: 0
             e2e: 1
             testcontainers: 1
+          - suite: webflux-react
+            entity: none 
+            jhi-app-sample: webflux-react
+            jdl-entity: 'custom-id.jdl' 
+            environment: prod 
+            war: 0 
+            e2e: 1 
+            testcontainers: 1 
+            sonar-analyse: 'false' 
     steps:
       #----------------------------------------------------------------------
       # Install all tools and check configuration
