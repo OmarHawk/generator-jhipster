@@ -90,6 +90,7 @@ jobs:
           - webflux-psql-additional
           - webflux-mariadb-gradle
           - webflux-couchbase
+          - webflux-react
         include:
           - suite: webflux-mongodb
             app-sample: webflux-mongodb
