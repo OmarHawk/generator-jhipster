@@ -153,7 +153,7 @@ jobs:
           - suite: webflux-react
             entity: none
             jhi-app-sample: webflux-react
-            jdl-entity: 'custom-id.jdl'
+            jdl-entity: '*'
             environment: prod
             war: 0
             e2e: 1
