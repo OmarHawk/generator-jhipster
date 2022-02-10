@@ -22,8 +22,8 @@ const mapper = entityInstance  + 'Mapper';
 const dtoToEntity = mapper + '.' + 'toEntity';
 const entityToDtoReference = mapper + '::' + 'toDto';
 _%>
-<%_ if (isPersisted) { _%>
-       <%= persistInstance %>.setIsPersisted();
+<%_ if (isPersisted && viaService && !dtoMapstruct) { _%>
+       <%= instanceName %>.setIsPersisted();
 <%_ } _%>
 <%_ if (viaService) { _%>
         return <%= entityInstance %>Service.save(<%= instanceName %>)
