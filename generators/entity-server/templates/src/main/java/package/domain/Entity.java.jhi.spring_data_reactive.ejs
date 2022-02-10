@@ -128,11 +128,12 @@ import org.springframework.data.relational.core.mapping.Table;
     private boolean isNew;
   <&_ } -&>
   <&_ if (fragment.classAdditionalFieldsMethodsSection) { -&>
-
+    <%_ if (primaryKey.name !== 'id') { -%>
     @Override
     public <%= primaryKey.type %> getId() {
         return this.<%= primaryKey.name %>;
     }
+    <%_ } -%>
 
     @Transient
     @Override
