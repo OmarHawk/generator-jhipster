@@ -27,11 +27,11 @@ public class <%= persistClass %>Callback implements AfterSaveCallback<<%= persis
 
     @Override
     public <%= persistClass %> onAfterSave(<%= persistClass %> aggregate) {
-        return aggregate.setIsNew();
+        return aggregate.setIsPersisted();
     }
 
     @Override
     public <%= persistClass %> onAfterConvert(<%= persistClass %> aggregate) {
-        return aggregate.setIsNew();
+        return aggregate.setIsPersisted();
     }
 }

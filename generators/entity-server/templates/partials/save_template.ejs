@@ -42,6 +42,9 @@ if (isUsingMapsId) {
   <%_ if (dtoMapstruct) { _%>
     <%_ resultEntity = persistInstance; _%>
         <%= persistClass %> <%= persistInstance %> = <%= dtoToEntity %>(<%= instanceName %>);
+    <%_ if (isPersisted) { _%>
+        <%= persistInstance %>.setIsPersisted();
+    <%_ } _%>
     <%_ if (isUsingMapsId) { _%>
         <%= mapsIdAssoc.otherEntity.primaryKey.type %> <%= otherEntityName %>Id = <%= instanceName %>.get<%= mapsIdAssoc.relationshipNameCapitalized %>().get<%= primaryKey.nameCapitalized %>();
         <%= mapsIdRepoInstance %>.findById(<%= otherEntityName %>Id).ifPresent(<%= persistInstance %>::<%_ if (!fluentMethods) { _%>set<%= mapsIdAssoc.relationshipNameCapitalized %> <%_ } else { _%><%= mapsIdAssoc.relationshipName %><%_ } _%>);
@@ -63,6 +66,9 @@ if (isUsingMapsId) {
     <%_ } _%>
   <%_ } _%>
 <%_ } else { _%>
+  <%_ if (isPersisted) { _%>
+    <%= persistInstance %>.setIsPersisted();
+  <%_ } _%>
   <%_ if (isUsingMapsId && !isController) { _%>
         <%= mapsIdAssoc.otherEntity.primaryKey.type %> <%= otherEntityName %>Id = <%= entityInstance %>.get<%= mapsIdAssoc.relationshipNameCapitalized %>().get<%= primaryKey.nameCapitalized %>();
         <%= mapsIdRepoInstance %>.findById(<%= otherEntityName %>Id).ifPresent(<%= entityInstance %>::<%_ if (!fluentMethods) { _%>set<%= mapsIdAssoc.relationshipNameCapitalized %> <%_ } else { _%><%= otherEntityName %><%_ } _%>);

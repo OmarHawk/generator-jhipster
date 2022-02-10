@@ -30,7 +30,7 @@
 
 <&_ if (fragment.classAdditionalFieldsSection) { -&>
     @Transient
-    private boolean isNew;
+    private boolean isPersisted;
 <&_ } -&>
 
 <&_ if (fragment.classAdditionalFieldsMethodsSection) { -&>
@@ -44,11 +44,11 @@
     @Transient
     @Override
     public boolean isNew() {
-        return !this.isNew;
+        return !this.isPersisted;
     }
 
-    public <%= persistClass %> setIsNew() {
-        this.isNew = true;
+    public <%= persistClass %> setIsPersisted() {
+        this.isPersisted = true;
         return this;
     }
  <&_ } -&>
