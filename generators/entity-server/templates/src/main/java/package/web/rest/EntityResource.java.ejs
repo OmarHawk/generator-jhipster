@@ -319,7 +319,7 @@ public class <%= entityClass %>Resource {
     <% } %>
   <%_ } _%>
 
-            <%- include('../../common/patch_template', {asEntity, asDto, isService: false, viaService: viaService}); -%>
+            <%- include('../../common/patch_template', {asEntity, asDto, isService: false, viaService: viaService, isPersisted: requiresPersistableImplementation}); -%>
   <%_ if (reactive) { _%>
             return result
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
