@@ -151,9 +151,8 @@ jobs:
             e2e: 1
             testcontainers: 1
           - suite: webflux-react
-            entity: none
-            jhi-app-sample: webflux-react
-            jdl-entity: '*'
+            app-sample: webflux-react
+            entity: sql
             environment: prod
             war: 0
             e2e: 1
