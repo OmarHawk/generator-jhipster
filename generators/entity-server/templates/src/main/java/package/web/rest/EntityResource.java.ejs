@@ -186,7 +186,7 @@ public class <%= entityClass %>Resource {
   <%_ for (field of primaryKey.fields.filter(f => f.autoGenerateByService)) { _%>
         <%= instanceName %>.set<%= field.fieldNameCapitalized %>(UUID.randomUUID());
   <%_ } _%>
-<%- include('/partials/save_template', {asEntity, asDto, viaService: viaService, returnDirectly: false, isUsingMapsId: isUsingMapsId, mapsIdAssoc: mapsIdAssoc, isController: true, isPersisted: false}); -%>
+<%- include('/partials/save_template', {asEntity, asDto, viaService: viaService, returnDirectly: false, isUsingMapsId: isUsingMapsId, mapsIdAssoc: mapsIdAssoc, isController: true}); -%>
   <%_ if (reactive) { _%>
             .map(result -> {
                 try {
@@ -253,7 +253,7 @@ public class <%= entityClass %>Resource {
       <%_ } _%>
     <% } %>
   <%_ } _%>
-<%- include('/partials/save_template', {asEntity, asDto, viaService: viaService, returnDirectly: false, isUsingMapsId: false, mapsIdAssoc: mapsIdAssoc, isPersisted: requiresPersistableImplementation}); -%>
+<%- include('/partials/update_template', {asEntity, asDto, viaService: viaService, returnDirectly: false, isUsingMapsId: false, mapsIdAssoc: mapsIdAssoc, isPersisted: requiresPersistableImplementation}); -%>
   <%_ if (reactive) { _%>
             .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
             .map(result -> ResponseEntity.ok()
