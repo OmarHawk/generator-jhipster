@@ -540,6 +540,9 @@ if (field.fieldTypeString || field.blobContentTypeText) {
         <%_ alreadyGeneratedEntities.push(otherEntityName) _%>
     <%_ } _%>
   <%_ } _%>
+  <%_ if (fieldStatus === 'DEFAULT_' && requiresPersistableImplementation) { _%>
+        <%= persistInstance %>.setIsNew();
+  <%_ } _%>
         return <%= persistInstance %>;
     }
 <%_ }); _%>
