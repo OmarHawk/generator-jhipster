@@ -49,6 +49,27 @@ relationship ManyToOne {
 }
 `;
 
+const jdlApplicationWithAddedEntityAndRelationshipToAdded = `
+${jdlApplicationWithEntities}
+entity Configset {
+  @Id addedId Long
+  someString String
+}
+
+entity AConfigset
+
+relationship OneToMany {
+  One{add} to Configset{one(original)},
+}
+
+relationship ManyToOne {
+  Another to AConfigset{an},
+}
+
+relationship ManyToMany {
+  AConfigset{configset(someString)} to Configset{acs},
+}`;
+
 const jdlApplicationWithRelationshipToUser = `
 ${jdlApplicationWithEntities}
 relationship ManyToOne {
@@ -1192,6 +1213,58 @@ entity Customer {
     });
     it('should match snapshot', () => {
       expect(runResult.getSnapshot('**/src/main/resources/config/liquibase/**')).toMatchSnapshot();
+    });
+  });
+
+  describe('when adding a new entity and a relationship using that new entity in the same run', () => {
+    let runResult;
+    before(async () => {
+      const baseName = 'JhipsterApp';
+      const initialState = createImporterFromContent(jdlApplicationWithEntities, {
+        ...options,
+        creationTimestampConfig: options.creationTimestamp,
+      }).import();
+      const applicationWithEntities = initialState.exportedApplicationsWithEntities[baseName];
+      expect(applicationWithEntities).toBeTruthy();
+      expect(applicationWithEntities.entities.length).toBe(2);
+      runResult = await helpers
+        .create(generatorPath)
+        .withJHipsterConfig(config)
+        .withOptions({ ...options, applicationWithEntities })
+        .run();
+
+      const state = createImporterFromContent(jdlApplicationWithAddedEntityAndRelationshipToAdded, {
+        ...options,
+      }).import();
+      runResult = await runResult
+        .create(generatorPath)
+        .withOptions({
+          ...options,
+          applicationWithEntities: state.exportedApplicationsWithEntities[baseName],
+          creationTimestamp: '2020-01-02',
+        })
+        .run();
+    });
+
+    after(() => runResult.cleanup());
+
+    it('should create application', () => {
+      runResult.assertFile(['.yo-rc.json']);
+    });
+    it('should create all entity config files', () => {
+      runResult.assertFile([
+        join('.jhipster', 'One.json'),
+        join('.jhipster', 'Another.json'),
+        join('.jhipster', 'Configset.json'),
+        join('.jhipster', 'AConfigset.json'),
+      ]);
+    });
+
+    it('should create entity initial changelog', () => {
+      runResult.assertFile([
+        `${SERVER_MAIN_RES_DIR}config/liquibase/changelog/20200101000100_added_entity_One.xml`,
+        `${SERVER_MAIN_RES_DIR}config/liquibase/changelog/20200101000200_added_entity_Another.xml`,
+      ]);
     });
   });
 
