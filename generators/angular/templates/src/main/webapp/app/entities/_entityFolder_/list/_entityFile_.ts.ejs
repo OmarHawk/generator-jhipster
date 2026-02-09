@@ -34,7 +34,7 @@ import { Component, computed, effect, inject, OnInit, signal, WritableSignal } f
 import { HttpHeaders } from '@angular/common/http';
 <%_ } _%>
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
-import { combineLatest<%_ if (!readOnly) { _%>, filter<%_ } _%>, finalize, Observable, Subscription, tap } from 'rxjs';
+import { combineLatest<%_ if (!readOnly) { _%>, filter<%_ } _%>, finalize, Observable<%_ if (!paginationInfiniteScroll) { _%>, Subject<%_ } _%>, Subscription<%_ if (!paginationInfiniteScroll) { _%>, switchMap<%_ } _%>, tap } from 'rxjs';
 <%_ if (!readOnly) { _%>
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 <%_ } _%>
@@ -136,6 +136,9 @@ export class <%= componentName %> implements OnInit {
 
 <%_ } _%>
     subscription: Subscription | null = null;
+<%_ if (!paginationInfiniteScroll) { _%>
+    loadTrigger$ = new Subject<void>();
+<%_ } _%>
     <%= entityInstancePlural %> = signal<I<%= entityAngularName %>[]>([]);
     isLoading = signal(false);
 
@@ -177,6 +180,10 @@ export class <%= componentName %> implements OnInit {
 <%_ } _%>
 
     ngOnInit(): void {
+<%_ if (!paginationInfiniteScroll) { _%>
+      this.loadTrigger$.pipe(switchMap(() => this.queryBackend())).subscribe((res: EntityArrayResponseType) => this.onResponseSuccess(res));
+
+<%_ } _%>
       this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data]).pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
 <%_ if (paginationInfiniteScroll) { _%>
@@ -259,7 +266,11 @@ export class <%= componentName %> implements OnInit {
 
 <%_ } _%>
     load(): void {
+<%_ if (paginationInfiniteScroll) { _%>
       this.queryBackend().subscribe((res: EntityArrayResponseType) => this.onResponseSuccess(res));
+<%_ } else { _%>
+      this.loadTrigger$.next();
+<%_ } _%>
     }
 
     navigateToWithComponentValues(event: SortState): void {
