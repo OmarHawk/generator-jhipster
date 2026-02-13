@@ -47,6 +47,9 @@ import {
 <%_ if (!readOnly) { _%>
   Subject,
 <%_ } _%>
+<%_ if (!paginationInfiniteScroll) { _%>
+  throwError,
+<%_ } _%>
 } from 'rxjs';
 <%_ if (!readOnly) { _%>
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -280,6 +283,34 @@ describe('<%= entityAngularName %> Management Component', () => {
     expect(comp.<%= entityInstancePlural %>()).toEqual([<%- testEntityPrimaryKey2 %>]);
     expect(comp.<%= entityInstancePlural %>()).not.toContain(expect.objectContaining(<%- testEntityPrimaryKey %>));
     <%= clientTestFramework %>.useRealTimers();
+  });
+
+  it('should keep subscription alive after HTTP error', () => {
+    // GIVEN
+    const successResponse = new HttpResponse({
+      body: [<%- testEntityPrimaryKey %>],
+      headers: new HttpHeaders(),
+    });
+
+    // Reset the spy from beforeEach and simulate error then success
+    <%= clientTestFramework %>.spyOn(service, 'query')
+      .mockReset()
+      .mockReturnValueOnce(throwError(() => new Error('HTTP Error')))
+      .mockReturnValueOnce(of(successResponse));
+
+    comp.ngOnInit();
+
+    // WHEN - first implicit load triggers an error
+    // Verify loading state was reset
+    expect(comp.isLoading()).toBe(false);
+    expect(comp.<%= entityInstancePlural %>()).toEqual([]);
+
+    // WHEN - second load should still work
+    comp.load();
+
+    // THEN - subscription is still alive and second load succeeds
+    expect(service.query).toHaveBeenCalledTimes(2);
+    expect(comp.<%= entityInstancePlural %>()).toEqual([<%- testEntityPrimaryKey %>]);
   });
 <%_ } _%>
 });

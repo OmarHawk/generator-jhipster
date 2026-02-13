@@ -34,7 +34,7 @@ import { Component, computed, effect, inject, OnInit, signal, WritableSignal } f
 import { HttpHeaders } from '@angular/common/http';
 <%_ } _%>
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
-import { combineLatest<%_ if (!readOnly) { _%>, filter<%_ } _%>, finalize, Observable<%_ if (!paginationInfiniteScroll) { _%>, Subject<%_ } _%>, Subscription<%_ if (!paginationInfiniteScroll) { _%>, switchMap<%_ } _%>, tap } from 'rxjs';
+import { <%_ if (!paginationInfiniteScroll) { _%>catchError, <%_ } _%>combineLatest<%_ if (!readOnly) { _%>, filter<%_ } _%><%_ if (!paginationInfiniteScroll) { _%>, EMPTY<%_ } _%>, finalize, Observable<%_ if (!paginationInfiniteScroll) { _%>, Subject<%_ } _%>, Subscription<%_ if (!paginationInfiniteScroll) { _%>, switchMap<%_ } _%>, tap } from 'rxjs';
 <%_ if (!readOnly) { _%>
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 <%_ } _%>
@@ -181,7 +181,14 @@ export class <%= componentName %> implements OnInit {
 
     ngOnInit(): void {
 <%_ if (!paginationInfiniteScroll) { _%>
-      this.loadTrigger$.pipe(switchMap(() => this.queryBackend())).subscribe((res: EntityArrayResponseType) => this.onResponseSuccess(res));
+      this.loadTrigger$.pipe(
+        switchMap(() => this.queryBackend().pipe(
+          catchError(() => {
+            this.isLoading.set(false);
+            return EMPTY;
+          })
+        ))
+      ).subscribe((res: EntityArrayResponseType) => this.onResponseSuccess(res));
 
 <%_ } _%>
       this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data]).pipe(
