@@ -40,6 +40,9 @@ import { faEye, faPencilAlt, faPlus, faSort, faSortDown, faSortUp, faSync, faTim
 import { TranslateModule } from '@ngx-translate/core';
 <%_ } _%>
 import {
+<%_ if (!paginationInfiniteScroll) { _%>
+  delay,
+<%_ } _%>
   of,
 <%_ if (!readOnly) { _%>
   Subject,
@@ -243,6 +246,40 @@ describe('<%= entityAngularName %> Management Component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
       expect(comp.load).not.toHaveBeenCalled();
     }));
+  });
+<%_ } _%>
+<%_ if (!paginationInfiniteScroll) { _%>
+
+  it('should cancel previous load when new load is triggered', async () => {
+    <%= clientTestFramework %>.useFakeTimers();
+    // GIVEN
+    const firstResponse = new HttpResponse({
+      body: [<%- testEntityPrimaryKey %>],
+      headers: new HttpHeaders(),
+    });
+    const secondResponse = new HttpResponse({
+      body: [<%- testEntityPrimaryKey2 %>],
+      headers: new HttpHeaders(),
+    });
+
+    // Reset the spy from beforeEach and set up delayed responses
+    <%= clientTestFramework %>.spyOn(service, 'query')
+      .mockReturnValueOnce(of(firstResponse).pipe(delay(200)))  // Slow response
+      .mockReturnValueOnce(of(secondResponse).pipe(delay(10))); // Fast response
+
+    comp.ngOnInit();
+
+    // WHEN - trigger two loads in quick succession
+    comp.load();
+    comp.load();
+
+    // Advance time to complete fast response but not slow one
+    await <%= clientTestFramework %>.advanceTimersByTimeAsync(50);
+
+    // THEN - only the latest (second) response should be applied
+    expect(comp.<%= entityInstancePlural %>()).toEqual([<%- testEntityPrimaryKey2 %>]);
+    expect(comp.<%= entityInstancePlural %>()).not.toContain(expect.objectContaining(<%- testEntityPrimaryKey %>));
+    <%= clientTestFramework %>.useRealTimers();
   });
 <%_ } _%>
 });
